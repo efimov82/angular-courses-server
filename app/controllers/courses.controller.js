@@ -35,20 +35,21 @@ exports.create = (req, res) => {
 };
 
 /* Retrieve and return all notes from the database.
-* @return [items, count]
+ * @params [start, count, searchString]
+* @return [items, all, start, count]
 */
 exports.findAll = (req, res) => {
   let query = {};
   let limit = Number(req.query.count) ? Number(req.query.count) : 10;
   let offset = Number(req.query.start) ? Number(req.query.start) : 0;
 
-  if (req.body.searchString) {
+  if (req.query.searchString) {
     query = { title: /${req.body.searchString}/ };
   }
 
   Course.find(query).limit(limit).skip(offset)
   .then(courses => {
-    results = { item: courses };
+    results = { items: courses };
     Course.find(query).then(allCourses => {
       results.all = allCourses.length;
       results.start = offset;
@@ -62,13 +63,22 @@ exports.findAll = (req, res) => {
   });
 };
 
-// Find a single Course with Id
-exports.findOne = (req, res) => {
-  Course.findById(req.params.id)
-    .then(note => {
+/* Find Course by slug
+ * param: slug
+ * return Course
+*/
+exports.findBySlug = (req, res) => {
+  if(!req.params.slug) {
+    return res.status(400).send({
+      message: "Param slug can not be empty"
+    });
+  }
+
+  Course.find({ slug: req.params.slug })
+    .then(course => {
         if(!course) {
             return res.status(404).send({
-                message: "Course not found with id " + req.params.id
+                message: "Course not found with slug " + req.params.slug
             });
         }
         res.send(course);
@@ -84,57 +94,65 @@ exports.findOne = (req, res) => {
     });
 };
 
-// Update a Course identified by the Id in the request
+/* Update a Course by slug in the request
+ *
+ * @param: slug
+ * @body: [youtubeId, topRated, author, duration, title]
+ * @return Course
+ */
 exports.update = (req, res) => {
-  // Validate Request
-  if(!req.body.youtubeId) {
+  if(!req.params.slug) {
     return res.status(400).send({
-        message: "youtubeId can not be empty"
+      message: "Param slug can not be empty"
     });
   }
 
+  let dataForUpdate = req.body;
   // Find Course and update it with the request body
-  Course.findByIdAndUpdate(req.params.id, {
-      title: req.body.title || "Untitled Note",
-      youtubeId: req.body.youtubeId
-  }, {new: true})
+  Course.findOneAndUpdate({ slug: req.params.slug }, dataForUpdate, { new: true })
   .then(course => {
       if(!course) {
           return res.status(404).send({
-              message: "Course not found with id " + req.params.id
+              message: "Course not found with slug " + req.params.slug
           });
       }
       res.send(course);
   }).catch(err => {
       if(err.kind === 'ObjectId') {
           return res.status(404).send({
-              message: "Course not found with id " + req.params.id
+              message: "Course not found with slug " + req.params.slug
           });
       }
       return res.status(500).send({
-          message: "Error updating course with id " + req.params.id
+          message: "Error updating course with slug " + req.params.slug
       });
   });
 };
 
-// Delete a Course with the specified ID in the request
+// Delete a Course with the specified slug in the request
 exports.delete = (req, res) => {
-  Course.findByIdAndRemove(req.params.id)
+  if(!req.params.slug) {
+    return res.status(400).send({
+      message: "Param slug can not be empty"
+    });
+  }
+
+  Course.findOneAndRemove({ slug: req.params.slug })
     .then(course => {
         if(!course) {
             return res.status(404).send({
-                message: "Course not found with id " + req.params.id
+                message: "Course not found with slug " + req.params.slug
             });
         }
         res.send({message: "Course deleted successfully!"});
     }).catch(err => {
         if(err.kind === 'ObjectId' || err.name === 'NotFound') {
             return res.status(404).send({
-                message: "Course not found with id " + req.params.id
+                message: "Course not found with slug " + req.params.slug
             });
         }
         return res.status(500).send({
-            message: "Could not delete course with id " + req.params.id
+            message: "Could not delete course with slug " + req.params.dlug
         });
     });
 };

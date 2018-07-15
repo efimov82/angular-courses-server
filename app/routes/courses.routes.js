@@ -5,9 +5,9 @@ module.exports = (app) => {
 
   app.get('/courses', courses.findAll);
 
-  app.get('/courses/:id', courses.findOne);
+  app.get('/courses/:slug', courses.findBySlug);
 
-  app.put('/courses/:id', courses.update);
+  app.put('/courses/:slug', courses.update);
 
-  app.delete('/courses/:id', courses.delete);
+  app.delete('/courses/:slug', courses.delete);
 }
