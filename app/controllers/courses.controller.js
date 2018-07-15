@@ -81,7 +81,7 @@ exports.findBySlug = (req, res) => {
                 message: "Course not found with slug " + req.params.slug
             });
         }
-        res.send(course);
+        res.send(course[0]);
     }).catch(err => {
         if(err.kind === 'ObjectId') {
             return res.status(404).send({
