@@ -20,7 +20,7 @@ exports.create = (req, res) => {
     title: req.body.title || '',
     thumbnail: req.body.thumbnail || '',
     youtubeId: req.body.youtubeId,
-    topRated: (req.body.topRated) ? true : false,
+    topRated: (req.body.topRated == 1 || req.body.topRated == 'true') ? true : false,
   });
 
   // Save Note in the database
