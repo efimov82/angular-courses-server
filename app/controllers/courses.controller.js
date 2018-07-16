@@ -43,8 +43,12 @@ exports.findAll = (req, res) => {
   let limit = Number(req.query.count) ? Number(req.query.count) : 10;
   let offset = Number(req.query.start) ? Number(req.query.start) : 0;
 
-  if (req.query.searchString) {
-    query = { title: /${req.body.searchString}/ };
+  if (req.query.search) {
+    query = { $or: [
+      {'title': { $regex: req.query.search, $options: 'i'}},
+      {'description': { $regex: req.query.search, $options: 'i'}}
+    ],
+    };
   }
 
   Course.find(query).limit(limit).skip(offset)
