@@ -1,13 +1,13 @@
 module.exports = (app) => {
-  const courses = require('../controllers/courses.controller.js');
+  const courses = require('../controllers/courses.controller');
+  const userHandlers = require('../controllers/auth.controller');
 
-  app.post('/courses', courses.create);
+  app.route('/courses')
+    .get(courses.findAll)
+    .post(userHandlers.loginRequired, courses.create);
 
-  app.get('/courses', courses.findAll);
-
-  app.get('/courses/:slug', courses.findBySlug);
-
-  app.put('/courses/:slug', courses.update);
-
-  app.delete('/courses/:slug', courses.delete);
+  app.route('/courses/:slug')
+    .get(courses.findBySlug)
+    .put(userHandlers.loginRequired, courses.update)
+    .delete(userHandlers.loginRequired, courses.delete);
 }

@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
+jsonwebtoken = require("jsonwebtoken");
+
 // Configuring the database
 const dbConfig = require('./config/database.config.js');
 const mongoose = require('mongoose');
@@ -50,7 +52,23 @@ app.get('/', (req, res) => {
   res.json({"message": "Welcome to Easy Courses application. Take courses quickly."});
 });
 
+// route middleware to verify a token
+app.use(function(req, res, next) {
+  if (req.headers && req.headers.authorization && req.headers.authorization.split(' ')[0] === 'JWT') {
+    jsonwebtoken.verify(req.headers.authorization.split(' ')[1], 'secretKey', function(err, decode) {
+    if (err) req.user = undefined;
+      req.user = decode;
+      console.log(decode);
+      next();
+    });
+  } else {
+    req.user = undefined;
+    next();
+  }
+});
+
 require('./app/routes/courses.routes.js')(app);
+require('./app/routes/auth.routes.js')(app);
 
 // listen for requests
 app.listen(3000, () => {
