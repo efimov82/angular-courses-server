@@ -32,17 +32,17 @@ exports.login = (req, res) => {
   User.findOne({ email: email })
     .then(user => {
       if (!user) {
-        res.json({ success: false, message: 'Authentication failed. User wrong.' });
+        res.json({ success: false, message: 'Authentication failed.' });
       } else {
         // check if password matches
         if (user.password != password) {
-          res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+          res.json({ success: false, message: 'Authentication failed.' });
         } else {
           // return the information including token as JSON
           res.json({
             success: true,
             message: 'Enjoy your token!',
-            token: createToken(user, 'secretKey') //  app.get('superSecret')
+            token: createToken(user, process.env.JWT_SECRET) //  app.get('superSecret')
           });
         }
       }

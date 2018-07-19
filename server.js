@@ -2,15 +2,16 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 jsonwebtoken = require("jsonwebtoken");
+require('dotenv').config();
 
 // Configuring the database
-const dbConfig = require('./config/database.config.js');
+// const dbConfig = require('./config/database.config.js');
 const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
 // Connecting to the database
-mongoose.connect(dbConfig.url)
+mongoose.connect(process.env.DB_HOST)
 .then(() => {
     console.log("Successfully connected to the database");
 }).catch(err => {
@@ -31,7 +32,7 @@ app.use(bodyParser.json())
 app.use(function (req, res, next) {
 
   // Website you wish to allow to connect
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5300');
+  res.setHeader('Access-Control-Allow-Origin', process.env.ACCESS_CONTROL_ALLOW_ORIGIN);
 
   // Request methods you wish to allow
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -55,7 +56,7 @@ app.get('/', (req, res) => {
 // route middleware to verify a token
 app.use(function(req, res, next) {
   if (req.headers && req.headers.authorization && req.headers.authorization.split(' ')[0] === 'JWT') {
-    jsonwebtoken.verify(req.headers.authorization.split(' ')[1], 'secretKey', function(err, decode) {
+    jsonwebtoken.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET, function(err, decode) {
     if (err) req.user = undefined;
       req.user = decode;
       console.log(decode);
