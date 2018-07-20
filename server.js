@@ -10,6 +10,8 @@ const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
+const port = process.env.LISTEN_PORT ? process.env.LISTEN_PORT : 3000;
+
 // Connecting to the database
 mongoose.connect(process.env.DB_HOST)
 .then(() => {
@@ -59,6 +61,7 @@ app.use(function(req, res, next) {
     jsonwebtoken.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET, function(err, decode) {
     if (err) req.user = undefined;
       req.user = decode;
+      // TODO add log user login
       console.log(decode);
       next();
     });
@@ -72,6 +75,6 @@ require('./app/routes/courses.routes.js')(app);
 require('./app/routes/auth.routes.js')(app);
 
 // listen for requests
-app.listen(3000, () => {
-    console.log("Server is listening on port 3000");
+app.listen(port, () => {
+    console.log("Server is listening on port ", port);
 });
