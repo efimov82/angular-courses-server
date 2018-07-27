@@ -10,7 +10,7 @@ const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
-const port = process.env.LISTEN_PORT ? process.env.LISTEN_PORT : 3000;
+const port = 3000; //process.env.LISTEN_PORT ? process.env.LISTEN_PORT :
 
 // Connecting to the database
 mongoose.connect(process.env.DB_HOST)

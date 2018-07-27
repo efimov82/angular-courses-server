@@ -42,7 +42,7 @@ exports.login = (req, res) => {
           res.json({
             success: true,
             message: 'Enjoy your token!',
-            token: createToken(user, process.env.JWT_SECRET) //  app.get('superSecret')
+            token: createToken(user, process.env.JWT_SECRET)
           });
         }
       }
