@@ -4,21 +4,31 @@ const Course = require('../models/course.model.js');
 exports.create = (req, res) => {
   if(!req.body.youtubeId) {
     return res.status(400).send({
-      message: "Course youtubeId can not be empty"
+      message: "Field youtubeId can not be empty"
     });
   }
 
   const slug = generateSlug();
 
+  // Upload thumbnail
+  if (req.files.thumbnail) {
+    let thumbnail = req.files.thumbnail;
+    let filename = slug + '.' + thumbnail.filename.substr(-3);
+    preview.mv('../uploadedFiles/previews/'+filename, function(err) {
+      if (err) {
+        return res.status(500).send(err);
+      }
+    });
+  }
   // Create a Course
   const course = new Course({
     slug: slug,
     author: req.body.author || '', // Todo
     dateCreation: req.body.dateCreation || Date(),
-    description: req.body.description || "Untitled description",
+    description: req.body.description || "",
     duration: req.body.duration || 0,
     title: req.body.title || '',
-    thumbnail: req.body.thumbnail || '',
+    thumbnail: filename || '',
     youtubeId: req.body.youtubeId,
     topRated: (req.body.topRated == 1 || req.body.topRated == 'true') ? true : false,
   });

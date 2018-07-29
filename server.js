@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 jsonwebtoken = require("jsonwebtoken");
 require('dotenv').config();
 
+const fileUpload = require('express-fileupload');
 // Configuring the database
 // const dbConfig = require('./config/database.config.js');
 const mongoose = require('mongoose');
@@ -40,7 +41,7 @@ app.use(function (req, res, next) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
 
   // Request headers you wish to allow
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+  res.setHeader('Access-Control-Allow-Headers', 'Authorization,X-Requested-With,content-type');
 
   // Set to true if you need the website to include cookies in the requests sent
   // to the API (e.g. in case you use sessions)
@@ -57,7 +58,7 @@ app.get('/', (req, res) => {
 
 // route middleware to verify a token
 app.use(function(req, res, next) {
-  if (req.headers && req.headers.authorization && req.headers.authorization.split(' ')[0] === 'JWT') {
+  if (req.headers && req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
     jsonwebtoken.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET, function(err, decode) {
     if (err) req.user = undefined;
       req.user = decode;
