@@ -7,20 +7,11 @@ jsonwebtoken = require("jsonwebtoken");
 require('dotenv').config();
 
 const fileUpload = require('express-fileupload');
-// Configuring the database
-// const dbConfig = require('./config/database.config.js');
 const mongoose = require('mongoose');
-
-// Sertificates
-console.log(process.env.SSL_PRIVATE_KEY);
-
-var privateKey  = fs.readFileSync(process.env.SSL_PRIVATE_KEY, 'utf8');
-var certificate = fs.readFileSync(process.env.SSL_PUBLIC_KEY, 'utf8');
-var credentials = {key: privateKey, cert: certificate};
 
 mongoose.Promise = global.Promise;
 
-const port = 3000; //process.env.LISTEN_PORT ? process.env.LISTEN_PORT :
+const port = process.env.LISTEN_PORT ? process.env.LISTEN_PORT : 3000;
 
 // Connecting to the database
 mongoose.connect(process.env.DB_HOST)
@@ -86,13 +77,17 @@ app.use(function(req, res, next) {
 require('./app/routes/courses.routes.js')(app);
 require('./app/routes/auth.routes.js')(app);
 
-// var httpsServer = https.createServer(credentials, app);
+if (process.env.DEVELOPMENT_MODE) { // Develop HTTP server
+  app.listen(port, () => {
+    console.log(`Server listining: http:${process.env.HOST_NAME}:${port}`);
+  });
+} else { // Production Server HTTPS
+  const privateKey  = fs.readFileSync(process.env.SSL_PRIVATE_KEY, 'utf8');
+  const certificate = fs.readFileSync(process.env.SSL_PUBLIC_KEY, 'utf8');
+  const credentials = {key: privateKey, cert: certificate};
+  const httpsServer = https.createServer(credentials, app);
 
-// httpsServer.listen(port, () => {
-//   console.log("Server is listening on port ", port);
-// });
-
-
-app.listen(port, () => {
-    console.log("Server is listening on port ", port);
-});
+  httpsServer.listen(port, () => {
+    console.log(`Server listining: https:${process.env.HOST_NAME}:${port}`);
+  });
+}
