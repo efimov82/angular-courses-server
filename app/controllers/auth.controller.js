@@ -7,20 +7,29 @@ exports.signup = (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
 
-  // Create User
-  const user = new User({
-    slug: common.generateSlug(),
-    email: email,
-    password: bcrypt.hashSync(password),
-  });
-
-  user.save()
-    .then(data => {
-        res.send(data);
-    }).catch(err => {
-        res.status(500).send({
-            message: err.message || "Some error occurred while signup proccess."
+  User.findOne({ email: email })
+    .then(user => {
+      if (user) {
+        res.status(409).json({ message: 'Email already exist.' });
+      } else {
+        // Create User
+        const user = new User({
+          slug: common.generateSlug(),
+          email: email,
+          password: bcrypt.hashSync(password),
         });
+
+        user.save()
+          .then(data => {
+              res.send(data);
+          }).catch(err => {
+              res.status(500).send({
+                  message: err.message || "Some error occurred while signup proccess."
+              });
+          });
+      }
+    }).catch(err => {
+      console.log(err);
     });
 };
 
@@ -32,17 +41,19 @@ exports.login = (req, res) => {
   User.findOne({ email: email })
     .then(user => {
       if (!user) {
-        res.json({ success: false, message: 'Authentication failed.' });
+        res.json({ success: false, message: 'Authentication failed user not found.' });
       } else {
         // check if password matches
-        if (user.password != password) {
-          res.json({ success: false, message: 'Authentication failed.' });
-        } else {
-          // return the information including token as JSON
+        if (bcrypt.compareSync(password, user.password)) {
           res.json({
             success: true,
             message: 'Enjoy your token!',
             token: createToken(user, process.env.JWT_SECRET)
+          });
+        } else {
+          res.json({
+            success: false,
+            message: 'Authentication failed.'
           });
         }
       }

@@ -9,12 +9,12 @@ exports.create = (req, res) => {
   }
 
   const slug = generateSlug();
-
+  let filename = '';
   // Upload thumbnail
-  if (req.files.thumbnail) {
+  if (req.files && req.files.thumbnail) {
     let thumbnail = req.files.thumbnail;
-    let filename = slug + '.' + thumbnail.filename.substr(-3);
-    preview.mv('../uploadedFiles/previews/'+filename, function(err) {
+    filename = slug + '.' + thumbnail.filename.substr(-3);
+    preview.mv('../../public/images/courses/'+filename, function(err) {
       if (err) {
         return res.status(500).send(err);
       }
@@ -63,6 +63,13 @@ exports.findAll = (req, res) => {
 
   Course.find(query).limit(limit).skip(offset)
   .then(courses => {
+    courses.forEach(course => {
+        let path = process.env.HOST_NAME + ':' + process.env.LISTEN_PORT + '/images/courses/';
+        if (!course.thumbnail) {
+            course.thumbnail = 'default.png'
+        }
+        course.thumbnail = path + course.thumbnail;
+    });
     results = { items: courses };
     Course.find(query).then(allCourses => {
       results.all = allCourses.length;

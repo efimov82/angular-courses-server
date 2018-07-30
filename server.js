@@ -1,5 +1,7 @@
+const fs = require('fs');
 const express = require('express');
 const bodyParser = require('body-parser');
+const https = require('https');
 
 jsonwebtoken = require("jsonwebtoken");
 require('dotenv').config();
@@ -8,6 +10,13 @@ const fileUpload = require('express-fileupload');
 // Configuring the database
 // const dbConfig = require('./config/database.config.js');
 const mongoose = require('mongoose');
+
+// Sertificates
+console.log(process.env.SSL_PRIVATE_KEY);
+
+var privateKey  = fs.readFileSync(process.env.SSL_PRIVATE_KEY, 'utf8');
+var certificate = fs.readFileSync(process.env.SSL_PUBLIC_KEY, 'utf8');
+var credentials = {key: privateKey, cert: certificate};
 
 mongoose.Promise = global.Promise;
 
@@ -24,6 +33,8 @@ mongoose.connect(process.env.DB_HOST)
 
 // create express app
 const app = express();
+
+app.use(express.static('public'));
 
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -75,7 +86,13 @@ app.use(function(req, res, next) {
 require('./app/routes/courses.routes.js')(app);
 require('./app/routes/auth.routes.js')(app);
 
-// listen for requests
+// var httpsServer = https.createServer(credentials, app);
+
+// httpsServer.listen(port, () => {
+//   console.log("Server is listening on port ", port);
+// });
+
+
 app.listen(port, () => {
     console.log("Server is listening on port ", port);
 });
