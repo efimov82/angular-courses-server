@@ -18,8 +18,6 @@ exports.create = async(req, res) => {
     return res.status(500).send(err);
   }
 
-  console.log(req.body);
-
   // Create a Course
   const course = new Course({
     slug: slug,
@@ -184,6 +182,7 @@ exports.delete = (req, res) => {
           message: "Course not found with slug " + req.params.slug
         });
       }
+      // TODO remove files of deleted Course
       res.send({ message: "Course deleted successfully!" });
     }).catch(err => {
       if (err.kind === 'ObjectId' || err.name === 'NotFound') {
