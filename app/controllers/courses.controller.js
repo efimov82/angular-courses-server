@@ -18,14 +18,16 @@ exports.create = async(req, res) => {
     return res.status(500).send(err);
   }
 
+  console.log(req.body);
+
   // Create a Course
   const course = new Course({
     slug: slug,
-    author: req.body.author || '', // Todo
-    dateCreation: req.body.dateCreation || Date(),
-    description: req.body.description || "",
-    duration: req.body.duration || 0,
-    title: req.body.title || '',
+    authors: req.body.authors ? req.body.authors : '', // Todo
+    dateCreation: req.body.dateCreation ? req.body.dateCreation : Date(),
+    description: req.body.description ? req.body.description : '',
+    duration: req.body.duration ? req.body.duration : 0,
+    title: req.body.title ? req.body.title : '',
     thumbnail: filename,
     youtubeId: req.body.youtubeId,
     topRated: (req.body.topRated == 1 || req.body.topRated == 'true') ? true : false,

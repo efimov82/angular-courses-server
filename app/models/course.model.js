@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const CourseSchema = mongoose.Schema({
   id: Number,
   slug: String,
-  author: String,
+  authors: String,
   dateCreation: Date,
   description: String,
   duration: Number,
