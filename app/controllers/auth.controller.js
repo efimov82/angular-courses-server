@@ -21,11 +21,11 @@ exports.signup = (req, res) => {
 
         user.save()
           .then(data => {
-              res.send(data);
+            res.send(data);
           }).catch(err => {
-              res.status(500).send({
-                  message: err.message || "Some error occurred while signup proccess."
-              });
+            res.status(500).send({
+              message: err.message || "Some error occurred while signup proccess."
+            });
           });
       }
     }).catch(err => {
@@ -60,7 +60,8 @@ exports.login = (req, res) => {
     }).catch(err => {
       // TODO log error
       return res.status(500).send({
-          message: "Login failed: " + err.message
+        success: false,
+        message: "Login failed: " + err.message
       });
     });
 
