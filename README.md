@@ -13,13 +13,13 @@ sudo docker-compose up
 Server API:
 
 Registration:
-POST localhost:3000/auth/signup
+POST http://localhost:3000/auth/signup
 Params:
 - email
 - password
 
 Sign-In
-localhost:3000/auth/login
+POST http://localhost:3000/auth/login
 Params
 - email
 - password
